@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <style>
+      .preview {
+        width: 100%;
+        height: 800px;
+      }
+      .xslt-input {
+      width: 100%;
+      height: 200px;
+      }
+    </style>
+    <script src="http://yastatic.net/jquery/2.1.3/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    console.log('PRE INIT');
+    $(document).ready(function() {
+    console.log('INIT');
+    
+    $('form').submit(function(ev) {
+      console.log('Form was submitted');
+      ev.preventDefault();
+      var form = $('form');
+      $.post(form.attr('action'), form.serialize()).success(function() {
+        console.log('reloading iframe');
+        $('iframe')[0].contentWindow.location.reload();
+      });
+    });
+
+    });
+  </script>
+
+  </head>
+  <body>
+    <h1>XSLT</h1>
+    <form method="POST" action="/xslt/{{session_id}}">
+      <textarea class="xslt-input" name="xslt">
+<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:amch="http://allmychanges.com/functions">
+
+  <xsl:template match="/ | @* | node()" name="identity">
+    <xsl:copy><xsl:apply-templates select="@* | node()" /></xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="*[@id='title-text']">
+    <xsl:call-template name="identity"/>
+    <xsl:copy-of select="//node()[@id='content']"/>
+  </xsl:template>
+
+  <xsl:template match="h3[@class='changelog_header']">
+    <h1><xsl:value-of select="amch:re.sub('.*?-(\d+(?:\.\d+)+)', '\1', text())"/></h1>
+  </xsl:template>
+  
+  <xsl:template match="fieldset | script"/>
+</xsl:stylesheet>
+      </textarea>
+      <input type="submit"/>
+    </form>
+
+    <h1>Preview</h1>
+    <iframe class="preview" src="/p/{{session_id}}" />
+  </body>
+</html>
