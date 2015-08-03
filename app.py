@@ -61,7 +61,7 @@ def html_document_fromstring(text):
 def preview(session_id):
     session = sessions[session_id]
     url =  session['url']
-    response = requests.get(url).content
+    response = requests.get(url, verify=False).content
 
     xslt =  session.get('xslt')
     if xslt:
