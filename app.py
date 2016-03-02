@@ -20,12 +20,22 @@ ns.prefix = 'amch'
 
 #namespaces = {'amch': 'http://allmychanges.com/functions'}
 def sub(context, pattern, replacement, text):
-    print 'SUBSTITUTE'
-    return re.sub(pattern, replacement, text[0])
+    if isinstance(text, (list, tuple)):
+        if text:
+            text = text[0]
+        else:
+            text = ''
+
+    return re.sub(pattern, replacement, text)
 ns['re.sub'] = sub
 
 def match(context, pattern, text):
-    return re.match(pattern, text[0]) is not None
+    if isinstance(text, (list, tuple)):
+        if text:
+            text = text[0]
+        else:
+            text = ''
+    return re.match(pattern, text) is not None
 ns['re.match'] = match
 
 
@@ -83,4 +93,4 @@ def save_xslt(session_id):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=8000)
